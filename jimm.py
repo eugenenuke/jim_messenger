@@ -19,8 +19,8 @@ def is_ip(ip):
     return False
 
 
-def port_is_num(num):
-    if num.isnumeric():
+def port_is_valid(num):
+    if num.isnumeric() and 0 < int(num) < 65536:
         return True
     print(E_STRINGS['badport'])
     return False
