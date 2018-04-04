@@ -8,17 +8,15 @@ import getopt
 
 from jimm import *
 
-class JIMSrv:
+class JIMServer:
 
     MAX_CLIENTS = 5
+    # Also see 'actions' dict at the end of the class
 
     def __init__(self, addr, port):
         self._addr = addr
         self._port = port
         self._users = []
-        self.actions = {
-                'presence': self.action_presence
-            }
 
     def add_user(self, user):
         self._users.append(user)
@@ -51,7 +49,7 @@ class JIMSrv:
         print(request)
         
         if request['action'] in self.actions:
-            response = self.actions[request['action']](request)
+            response = self.actions[request['action']](self, request)
         else:
             response = {
                         'response': 400,
@@ -61,6 +59,7 @@ class JIMSrv:
 
         response = json.dumps(response).encode()
         conn.send(response)
+        return response
 
     def start(self):
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as main_sock:
@@ -76,6 +75,9 @@ class JIMSrv:
             except Exception as e:
                 print(e)
 
+    actions = {
+            'presence': action_presence
+        }
 
 
 class JIMUser:
@@ -95,14 +97,14 @@ def check_opt(opt, opts, check):
 
 def main():
     opts = getopt.getopt(sys.argv[1:], 'a:p:')[0]
-    if not (check_opt('-a', opts, is_ip) and check_opt('-p', opts, port_is_num)):
+    if not (check_opt('-a', opts, is_ip) and check_opt('-p', opts, port_is_valid)):
         print('Usage: {} -p <port> -a <address>'.format(sys.argv[0]))
         sys.exit(BAD_OPTS)
     opts = dict(opts)
     addr = opts['-a']
     port = int(opts['-p'])
 
-    jim = JIMSrv(addr, port)
+    jim = JIMServer(addr, port)
     jim.start()
 
 
