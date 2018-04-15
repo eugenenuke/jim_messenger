@@ -86,7 +86,7 @@ class JIMServer(JIM):
             response = self._resp(200, 'Message was accepted.')
             for client in self._clients[2:]:
                 if client != conn:
-                    self.send_msg(data, client)
+                    self._send_msg(data, client)
                     # should a client answer?
         else:
             response = self._resp(401, 'You have to login.')
@@ -129,7 +129,7 @@ class JIMServer(JIM):
                         if input() == '\q':
                             kb_int = 1
                     else:
-                        request = self.recv_msg(client)
+                        request = self._recv_msg(client)
                         if request:
                             print(request)
                             
@@ -138,7 +138,7 @@ class JIMServer(JIM):
                             else:
                                 response = self._resp(400, 'Unknown action!')
                             if response:
-                                response = self.send_msg(response, client)
+                                response = self._send_msg(response, client)
                         else:
                             self.remove_client(client)
             self.close_all()

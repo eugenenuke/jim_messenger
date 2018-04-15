@@ -12,10 +12,16 @@ from jimm import *
 
 
 class JIMClient(JIM):
+
+    msg = JIMMsg()
+
     def __init__(self, addr, port):
         super().__init__(addr, port)
         self._user = 'User_{}'.format(random.randint(0, 9999))
         self._conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self._chat = JIMChat()
+        self._last_response = None
+
         try:
             self._conn.connect((self._addr, self._port))
         except ConnectionRefusedError as e:
@@ -27,7 +33,7 @@ class JIMClient(JIM):
                 'action': 'quit',
                 }
 
-        self.send_msg(data)
+        self._send_msg(data)
 
     @logger('Client is connecting to the server')
     def send_presence(self):
@@ -41,29 +47,14 @@ class JIMClient(JIM):
                     }
                 }
 
-        self.send_msg(data)
-        status = self.recv_msg()
+        self._send_msg(data)
+        status = self._recv_msg()
 
         # print(status)
-        return status
-
-    def send_to_chat(self, msg, chat='#default'):
-        data = {
-                'action': 'msg',
-                'time': time.time(),
-                'to': chat,
-                'from': self._user,
-                'message': msg
-                }
-        # print(data)
-        self.send_msg(data)
-        status = self.recv_msg()
-        # print(status)
-
         return status
 
     def get_message(self):
-        msg = self.recv_msg()
+        msg = self._recv_msg()
         if msg['action'] == 'msg':
             print('{}: {}'.format(msg['from'], msg['message']))
 
@@ -104,7 +95,8 @@ def main():
             msg = input('> ')
             if msg == '\q':
                 break
-            clnt.send_to_chat(msg)
+            # clnt.send_to_chat(msg)
+            clnt.msg = msg
     elif args.r:
         print('Waiting for messages (\'\q\' for quit)')
         kb_int = 0

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import json
+import time
 import logging
 from functools import wraps
 
@@ -34,7 +35,7 @@ class JIM:
         self._port = port
         self._conn = None
 
-    def send_msg(self, msg, conn=None):
+    def _send_msg(self, msg, conn=None):
         if not conn:
             conn = self._conn
         data = json.dumps(msg).encode()
@@ -43,7 +44,7 @@ class JIM:
         except BrokenPipeError as e:
             print(e)
 
-    def recv_msg(self, conn=None):
+    def _recv_msg(self, conn=None):
         if not conn:
             conn = self._conn
 
@@ -55,6 +56,35 @@ class JIM:
         if data:
             return json.loads(data.decode())
         return False
+
+ 
+class JIMMsg:
+    def __set__(self, instance, msg):
+        data = {
+                'action': 'msg',
+                'time': time.time(),
+                'to': instance._chat.get_name(),
+                'from': instance._user,
+                'message': msg
+                }
+        instance._send_msg(data)
+        status = instance._recv_msg()
+        try:
+            instance._last_response = status
+        except Exception:
+            pass
+
+
+class JIMResponse:
+    pass
+
+
+class JIMChat:
+    def __init__(self, chat_name='#default'):
+        self._name = chat_name
+
+    def get_name(self):
+        return self._name
 
 
 def is_ip(ip):
