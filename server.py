@@ -11,21 +11,9 @@ import logging
 from jimm import *
 
 
-class JIMChat():
-    def __init__(self, name):
-        self._name = name
-        self._messages = []
-        self._users = []
-
-    def add_message(self, msg, sender, time):
-        self._messages.append({'msg': msg, 'from': sender, 'time': time})
-        # print(self._messages)
-
-    def get_all_messages(self):
-        return self._messages
-
-
 class JIMServer(JIM):
+
+    response = JIMResponse() 
 
     MAX_CLIENTS = 5
     # Also see 'actions' dict at the end of the class
@@ -64,12 +52,7 @@ class JIMServer(JIM):
 
     @staticmethod
     def _resp(code, msg):
-        response = {
-                    'response': code,
-                    'time': time.time(),
-                    'alert': msg
-                }
-        return response
+        return (code, msg)
 
     @logger('Server is responding for the `presence` action.')
     def action_presence(self, data, conn):
@@ -138,7 +121,8 @@ class JIMServer(JIM):
                             else:
                                 response = self._resp(400, 'Unknown action!')
                             if response:
-                                response = self._send_msg(response, client)
+                                # response = self._send_msg(response, client)
+                                self.response = (response, client)
                         else:
                             self.remove_client(client)
             self.close_all()

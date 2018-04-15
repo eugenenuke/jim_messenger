@@ -76,15 +76,31 @@ class JIMMsg:
 
 
 class JIMResponse:
-    pass
+    def __set__(self, instance, data):
+        (code, msg), client = data
+        response = {
+                    'response': code,
+                    'time': time.time(),
+                    'alert': msg
+                }
+        instance._send_msg(response, client)
 
 
-class JIMChat:
+class JIMChat():
     def __init__(self, chat_name='#default'):
         self._name = chat_name
+        self._messages = []
+        self._users = []
 
     def get_name(self):
         return self._name
+
+    def add_message(self, msg, sender, time):
+        self._messages.append({'msg': msg, 'from': sender, 'time': time})
+        # print(self._messages)
+
+    def get_all_messages(self):
+        return self._messages
 
 
 def is_ip(ip):
