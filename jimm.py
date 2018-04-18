@@ -3,6 +3,7 @@
 import json
 import time
 import logging
+import argparse
 from functools import wraps
 
 import log_config
@@ -107,13 +108,11 @@ def is_ip(ip):
     octets = ip.split('.')
     if len(octets) == 4 and \
             all(el.isnumeric() and 0 <= int(el) < 256 for el in octets):
-        return True
-    print(E_STRINGS['badip'])
-    return False
+        return ip
+    raise argparse.ArgumentTypeError(E_STRINGS['badip'])
 
 
 def port_is_valid(num):
     if num.isnumeric() and 0 < int(num) < 65536:
-        return True
-    print(E_STRINGS['badport'])
-    return False
+        return int(num)
+    raise argparse.ArgumentTypeError(E_STRINGS['badport'])

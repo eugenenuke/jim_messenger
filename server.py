@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
 
+import argparse
+import logging
 import socket
-import json
-import time
-import sys
 import getopt
 import select
-import logging
+import sys
 
 from jimm import *
 
@@ -156,13 +155,13 @@ def check_opt(opt, opts, check):
 
 @logger('Server has started')
 def main():
-    opts = getopt.getopt(sys.argv[1:], 'a:p:')[0]
-    if not (check_opt('-a', opts, is_ip) and check_opt('-p', opts, port_is_valid)):
-        print('Usage: {} -p <port> -a <address>'.format(sys.argv[0]))
-        sys.exit(BAD_OPTS)
-    opts = dict(opts)
-    addr = opts['-a']
-    port = int(opts['-p'])
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-a', '--address', required=True, type=is_ip, help='address to bind')
+    parser.add_argument('-p', '--port', required=True, type=port_is_valid, help='port to bind')
+    args = parser.parse_args()
+
+    addr = args.address
+    port = args.port
 
     jim = JIMServer(addr, port)
     jim.start()

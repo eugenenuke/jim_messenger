@@ -2,6 +2,7 @@
 
 from unittest.mock import Mock
 import unittest
+import argparse
 import time
 import json
 
@@ -12,45 +13,52 @@ import client
 
 class TestIsIpFunction(unittest.TestCase):
     def test_no_dots(self):
-        self.assertFalse(is_ip('just a string'))
+        # self.aspsertFalse(is_ip('just a string'))
+        with self.assertRaises(argparse.ArgumentTypeError):
+            is_ip('just a string')
 
     def test_invalid_ndots(self):
-        self.assertFalse(is_ip('127.1'))
-        self.assertFalse(is_ip('192.168.100'))
-        self.assertFalse(is_ip('..'))
-        self.assertFalse(is_ip('....'))
+        with self.assertRaises(argparse.ArgumentTypeError):
+            is_ip('127.1')
+            is_ip('192.168.100')
+            is_ip('..')
+            is_ip('....')
 
     def test_invalid_octet(self):
-        self.assertFalse(is_ip('192.168.0.256'))
-        self.assertFalse(is_ip('256.168.0.2'))
-        self.assertFalse(is_ip('192.256.0.100'))
-        self.assertFalse(is_ip('192.168.256.0'))
-        self.assertFalse(is_ip('1000.1000.1000.1000'))
-        self.assertFalse(is_ip('-1.-1.-1.-1'))
+        with self.assertRaises(argparse.ArgumentTypeError):
+            is_ip('192.168.0.256')
+            is_ip('256.168.0.2')
+            is_ip('192.256.0.100')
+            is_ip('192.168.256.0')
+            is_ip('1000.1000.1000.1000')
+            is_ip('-1.-1.-1.-1')
 
     def test_correct_ip(self):
         self.assertTrue(is_ip('192.168.0.100'))
 
     def test_invalid_type(self):
-        with self.assertRaises(AttributeError):
+        with self.assertRaises(argparse.ArgumentTypeError):
             is_ip(65535)
 
 
 class TestPortIsNumFunction(unittest.TestCase):
     def test_string(self):
-        self.assertFalse(port_is_valid('str'))
+        with self.assertRaises(argparse.ArgumentTypeError):
+            port_is_valid('str')
 
     def test_mixed(self):
-        self.assertFalse(port_is_valid('str123'))
-        self.assertFalse(port_is_valid('str.123'))
+        with self.assertRaises(argparse.ArgumentTypeError):
+            port_is_valid('str123')
+            port_is_valid('str.123')
 
     def test_valid_num(self):
         self.assertTrue(port_is_valid('123'))
         self.assertTrue(port_is_valid('65535'))
 
     def test_invalid_num(self):
-        self.assertFalse(port_is_valid('0'))
-        self.assertFalse(port_is_valid('65536'))
+        with self.assertRaises(argparse.ArgumentTypeError):
+            port_is_valid('0')
+            port_is_valid('65536')
 
     def test_invalid_type(self):
         with self.assertRaises(AttributeError):

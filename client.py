@@ -69,22 +69,14 @@ class JIMClient(JIM):
 def main():
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('addr', help='server\' address')
-    parser.add_argument('port', nargs='?', default=7777, type=int, help='server\' port')
+    parser.add_argument('addr', type=is_ip, help='server\' address')
+    parser.add_argument('port', nargs='?', default=7777, type=port_is_valid, help='server\' port')
     parser.add_argument('-w', action='store_true', help='sends messages to the server')
     parser.add_argument('-r', action='store_true', help='reads messages from the server')
     args = parser.parse_args()
 
     addr = args.addr
     port = args.port
-
-    if not port_is_valid(str(port)):
-        port = None
-        
-    if not (is_ip(addr) and port):
-        print(E_STRINGS['badargs'])
-        print('Usage: {} <address> [<port>] [-w] [-r]'.format(sys.argv[0]))
-        sys.exit(BAD_OPTS)
 
     clnt = JIMClient(addr, port)
 
