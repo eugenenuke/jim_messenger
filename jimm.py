@@ -105,10 +105,11 @@ class JIMChat():
 
 
 def is_ip(ip):
-    octets = ip.split('.')
-    if len(octets) == 4 and \
-            all(el.isnumeric() and 0 <= int(el) < 256 for el in octets):
-        return ip
+    if isinstance(ip, str):
+        octets = ip.split('.')
+        if len(octets) == 4 and \
+                all(el.isnumeric() and 0 <= int(el) < 256 for el in octets):
+            return ip
     raise argparse.ArgumentTypeError(E_STRINGS['badip'])
 
 
